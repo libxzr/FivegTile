@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">5G Tile</string>
+    <string name="hint">提示</string>
+    <string name="hint_good">现在，您可以将磁贴添加到快速设置中以方便的开关 5G 。</string>
+    <string name="compatibility_pending">正在检查…</string>
+    <string name="compatibility_root_not_granted">没有 root 权限</string>
+    <string name="compatibility_not_compatible">不兼容</string>
+    <string name="compatibility_good">兼容性正常</string>
+    <string name="about">关于</string>
+    <string name="source_code">源代码</string>
+    <string name="open_source_licenses">开放源代码许可</string>
+    <string name="fiveg">5G</string>
+    <string name="hint_no_root">应用需要 root 权限才能正常工作 :(</string>
+    <string name="hint_not_compatible">很遗憾，应用目前与您所使用的系统不兼容。请考虑在本应用的 Github 仓库中打开一个 issue 并提供足够的信息 :)</string>
+</resources>
