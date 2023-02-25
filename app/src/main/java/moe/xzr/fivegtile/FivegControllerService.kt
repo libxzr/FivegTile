@@ -47,6 +47,8 @@ class FivegControllerService : RootService() {
         override fun compatibilityCheck(subId: Int): Boolean {
             return try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    reasonUser
+                    typeNr
                     iTelephony.setAllowedNetworkTypesForReason(
                         subId,
                         reasonUser,
@@ -56,6 +58,8 @@ class FivegControllerService : RootService() {
                         )
                     )
                 } else {
+                    modeLte
+                    modeNr
                     // For Q and R.
                     iTelephony.setPreferredNetworkType(
                         subId,
