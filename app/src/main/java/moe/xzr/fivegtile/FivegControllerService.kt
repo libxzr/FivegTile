@@ -1,9 +1,12 @@
 package moe.xzr.fivegtile
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.os.IBinder
+import android.os.ServiceManager
+import android.telephony.TelephonyManager
+import com.android.internal.telephony.ITelephony
 import com.topjohnwu.superuser.ipc.RootService
 
 /**
@@ -13,89 +16,33 @@ import com.topjohnwu.superuser.ipc.RootService
 class FivegControllerService : RootService() {
     companion object {
         private val iTelephony by lazy {
-            Class.forName("com.android.internal.telephony.ITelephony\$Stub")
-                .getDeclaredMethod("asInterface", IBinder::class.java)
-                .invoke(
-                    null,
-                    Class.forName("android.os.ServiceManager")
-                        .getDeclaredMethod("getService", String::class.java)
-                        .invoke(null, Context.TELEPHONY_SERVICE)
-                )
-        }
-        private val getAllowedNetworkTypesForReasonMethod by lazy {
-            Class.forName("com.android.internal.telephony.ITelephony")
-                .getDeclaredMethod(
-                    "getAllowedNetworkTypesForReason",
-                    Int::class.java,
-                    Int::class.java
-                )
-        }
-        private val getAllowedNetworkTypesMethod by lazy {
-            Class.forName("com.android.internal.telephony.ITelephony")
-                .getDeclaredMethod(
-                    "getAllowedNetworkTypes",
-                    Int::class.java
-                )
-        }
-        private val setAllowedNetworkTypesForReasonMethod by lazy {
-            Class.forName("com.android.internal.telephony.ITelephony")
-                .getDeclaredMethod(
-                    "setAllowedNetworkTypesForReason",
-                    Int::class.java,
-                    Int::class.java,
-                    Long::class.java
-                )
-        }
-        private val setAllowedNetworkTypesMethod by lazy {
-            Class.forName("com.android.internal.telephony.ITelephony")
-                .getDeclaredMethod(
-                    "setAllowedNetworkTypes",
-                    Int::class.java,
-                    Long::class.java
-                )
-        }
-        private val reasonUser by lazy {
-            Class.forName("android.telephony.TelephonyManager")
-                .getDeclaredField("ALLOWED_NETWORK_TYPES_REASON_USER")
-                .getInt(null)
-        }
-        private val typeNr by lazy {
-            Class.forName("android.telephony.TelephonyManager")
-                .getDeclaredField("NETWORK_TYPE_BITMASK_NR")
-                .getLong(null)
+            ITelephony.Stub.asInterface(ServiceManager.getService(Context.TELEPHONY_SERVICE))
         }
 
+        @SuppressLint("InlinedApi")
         private fun getAllowedNetworkTypes(subId: Int): Long {
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                getAllowedNetworkTypesForReasonMethod.invoke(
-                    iTelephony,
+                iTelephony.getAllowedNetworkTypesForReason(
                     subId,
-                    reasonUser
-                ) as Long
+                    TelephonyManager.ALLOWED_NETWORK_TYPES_REASON_USER
+                )
             } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
-                getAllowedNetworkTypesMethod.invoke(
-                    iTelephony,
-                    subId
-                ) as Long
+                iTelephony.getAllowedNetworkTypes(subId)
             } else {
                 throw RuntimeException("not compatible")
             }
         }
 
+        @SuppressLint("InlinedApi")
         private fun setAllowedNetworkTypes(subId: Int, types: Long): Boolean {
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                setAllowedNetworkTypesForReasonMethod.invoke(
-                    iTelephony,
+                iTelephony.setAllowedNetworkTypesForReason(
                     subId,
-                    reasonUser,
+                    TelephonyManager.ALLOWED_NETWORK_TYPES_REASON_USER,
                     types
-                ) as Boolean
+                )
             } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
-                setAllowedNetworkTypesMethod.invoke(
-                    iTelephony,
-                    subId,
-                    types
-                ) as Boolean
+                iTelephony.setAllowedNetworkTypes(subId, types)
             } else {
                 throw RuntimeException("not compatible")
             }
@@ -111,21 +58,23 @@ class FivegControllerService : RootService() {
             }
         }
 
+        @SuppressLint("InlinedApi")
         override fun getFivegEnabled(subId: Int): Boolean {
             return try {
-                getAllowedNetworkTypes(subId) and typeNr != 0L
+                getAllowedNetworkTypes(subId) and TelephonyManager.NETWORK_TYPE_BITMASK_NR != 0L
             } catch (_: Exception) {
                 false
             }
         }
 
+        @SuppressLint("InlinedApi")
         override fun setFivegEnabled(subId: Int, enabled: Boolean) {
             try {
                 var curTypes = getAllowedNetworkTypes(subId)
                 curTypes = if (enabled) {
-                    curTypes or typeNr
+                    curTypes or TelephonyManager.NETWORK_TYPE_BITMASK_NR
                 } else {
-                    curTypes and typeNr.inv()
+                    curTypes and TelephonyManager.NETWORK_TYPE_BITMASK_NR.inv()
                 }
                 setAllowedNetworkTypes(subId, curTypes)
             } catch (_: Exception) {
