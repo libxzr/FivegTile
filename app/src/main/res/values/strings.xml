@@ -3,13 +3,13 @@
     <string name="hint">Hint</string>
     <string name="hint_good">Now you can add the tile to the quick settings and toggle 5G conveniently.</string>
     <string name="compatibility_pending">Checking…</string>
-    <string name="compatibility_root_not_granted">Root not granted</string>
+    <string name="compatibility_shizuku_not_granted">Shizuku permission not granted</string>
     <string name="compatibility_not_compatible">Not compatible</string>
     <string name="compatibility_good">Compatible</string>
     <string name="about">About</string>
     <string name="source_code">Source Code</string>
     <string name="open_source_licenses">Open Source Licenses</string>
     <string name="fiveg">5G</string>
-    <string name="hint_no_root">Root permission is needed for this app to work properly :(</string>
+    <string name="hint_no_shizuku">Shizuku permission is needed for this app to work properly :(</string>
     <string name="hint_not_compatible">Sorry but this app is not compatible with your system. Consider to open an issue in the Github repository with enough information :)</string>
 </resources>
